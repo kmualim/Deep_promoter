@@ -1,8 +1,3 @@
-
-
-
-
-
 import collections
 import numpy as np
 import re
@@ -29,7 +24,7 @@ class NgramLanguageModel(object):
     def ngrams(self):
         n = self._n
         for sample in self._samples:
-            for i in xrange(len(sample)-n+1):
+            for i in range(len(sample)-n+1):
                 yield sample[i:i+n]
 
     def unique_ngrams(self):
@@ -91,39 +86,39 @@ class NgramLanguageModel(object):
         return 0.5*(kl_p_m + kl_q_m) / np.log(2)
 
 def load_dataset(max_length, max_n_examples, tokenize=False, max_vocab_size=2048, data_dir='/home/ishaan/data/1-billion-word-language-modeling-benchmark-r13output'):
-    print "loading dataset..."
+    print("loading dataset...")
 
     lines = []
 
     finished = False
 
-    path = data_dir+("/sequence_data.txt")
+    path = data_dir + "/sequence_data.txt"
     with open(path, 'r') as f:
-            for line in f:
-                line = line[:-1]
-                if tokenize:
-                    line = tokenize_string(line)
-                else:
-                    line = tuple(line)
+        for line in f:
+            line = line[:-1]
+            if tokenize:
+                line = tokenize_string(line)
+            else:
+                line = tuple(line)
 
-                if len(line) > max_length:
-                    line = line[:max_length]
+            if len(line) > max_length:
+                line = line[:max_length]
 
-                lines.append(line + ( ("`",)*(max_length-len(line)) ) )
+            lines.append(line + (("`",)*(max_length-len(line))))
 
-                if len(lines) == max_n_examples:
-                    finished = True
-                    break
+            if len(lines) == max_n_examples:
+                finished = True
+                break
 
     np.random.shuffle(lines)
 
     import collections
     counts = collections.Counter(char for line in lines for char in line)
 
-    charmap = {'unk':0}
+    charmap = {'unk': 0}
     inv_charmap = ['unk']
 
-    for char,count in counts.most_common(max_vocab_size-1):
+    for char, count in counts.most_common(max_vocab_size-1):
         if char not in charmap:
             charmap[char] = len(inv_charmap)
             inv_charmap.append(char)
@@ -138,8 +133,8 @@ def load_dataset(max_length, max_n_examples, tokenize=False, max_vocab_size=2048
                 filtered_line.append('unk')
         filtered_lines.append(tuple(filtered_line))
 
-    for i in xrange(100):
-        print filtered_lines[i]
+    for i in range(100):
+        print(filtered_lines[i])
 
-    print "loaded {} lines in dataset".format(len(lines))
+    print("loaded {} lines in dataset".format(len(lines)))
     return filtered_lines, charmap, inv_charmap
